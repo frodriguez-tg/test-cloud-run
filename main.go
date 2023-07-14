@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"entgo.io/ent/dialect/sql"
+
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -16,18 +17,17 @@ func main() {
 	log.Print("starting server...")
 	http.HandleFunc("/", handler)
 
-	dbURL := os.Getenv("V3_DBURL")
+	dbURI := os.Getenv("V3_DBURL")
 
-	db, err := sqlx.Open("pgx", dbURL)
+	db, err := sqlx.Open("pgx", dbURI)
 	if err != nil {
-		log.Fatal(err)
-	}
-	// Create an ent.Driver from `db`.
-	driver := sql.OpenDB("postgres", db.DB)
-	if driver.DB().Ping() != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to connect to db: %v", err)
 	}
 
+	driver := sql.OpenDB("postgres", db.DB)
+	if err = driver.DB().Ping(); err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println("ping to DB successfully")
 
 	// Determine port for HTTP service.
