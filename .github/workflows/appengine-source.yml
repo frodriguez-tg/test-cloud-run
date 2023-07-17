@@ -1,0 +1,35 @@
+name: Deploy to App Engine from Source
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  SERVICE: test-app-eng-v1 # TODO: update Cloud Run service name
+  REGION: us-central1 # TODO: update Cloud Run service region
+
+jobs:
+  deploy:
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: "Deploy to app Engine"
+        id: deploy
+        uses: 'google-github-actions/deploy-appengine@v1'
+
+      - id: 'test'
+        run: 'echo "${{ steps.deploy.outputs.url }}"'

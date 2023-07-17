@@ -1,0 +1,5 @@
+runtime: go120
+service: test-app-eng-v1
+env_variables:
+  NAME: "grob groby"
+  SECRET: "projects/1086996803216/secrets/v3-stg-db-url/versions/latest"
